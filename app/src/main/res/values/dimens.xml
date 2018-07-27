@@ -1,0 +1,6 @@
+<resources>
+    <dimen name="fab_margin">16dp</dimen>
+    <dimen name="seek_bar_width">200dp</dimen>
+    <dimen name="settings_element_height">30dp</dimen>
+    <dimen name="settings_color_wheel">125dp</dimen>
+</resources>
