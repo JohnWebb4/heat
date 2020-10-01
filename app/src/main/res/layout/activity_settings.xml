@@ -29,9 +29,7 @@
         android:layout_height="@dimen/settings_element_height"
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
-        android:text="@string/brush_strength"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textViewBrSize" />
+        android:text="@string/brush_strength" />
 
     <SeekBar
         android:id="@+id/seekBarBrStrength"
@@ -39,9 +37,7 @@
         android:layout_height="@dimen/settings_element_height"
         android:layout_marginTop="8dp"
         android:layout_marginEnd="8dp"
-        android:max="@integer/seekbar_max"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/seekBarBrSize" />
+        android:max="@integer/seekbar_max" />
 
     <TextView
         android:id="@+id/textViewHeatK"
@@ -49,9 +45,7 @@
         android:layout_height="@dimen/settings_element_height"
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
-        android:text="@string/heat_ka"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textViewBrStrength" />
+        android:text="@string/heat_ka" />
 
     <SeekBar
         android:id="@+id/seekBarHeatK"
@@ -59,9 +53,7 @@
         android:layout_height="@dimen/settings_element_height"
         android:layout_marginTop="8dp"
         android:layout_marginEnd="8dp"
-        android:max="@integer/seekbar_max"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/seekBarBrStrength" />
+        android:max="@integer/seekbar_max" />
 
     <TextView
         android:id="@+id/textViewHot"
@@ -69,19 +61,15 @@
         android:layout_height="@dimen/settings_element_height"
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
-        android:text="@string/heat_hot"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textViewHeatK" />
+        android:text="@string/heat_hot" />
 
-    <ImageView
+    <com.example.john.heat.ColorWheelView
         android:id="@+id/imageViewHot"
         android:layout_width="@dimen/settings_color_wheel"
         android:layout_height="@dimen/settings_color_wheel"
         android:layout_marginTop="8dp"
         android:layout_marginEnd="8dp"
         android:contentDescription="@string/color_wheel_description"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/seekBarHeatK"
         app:srcCompat="@mipmap/ic_color_wheel"
         tools:layout_editor_absoluteX="176dp" />
 
@@ -91,32 +79,30 @@
         android:layout_height="@dimen/settings_element_height"
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
-        android:text="@string/heat_cold"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/imageViewHot" />
+        android:text="@string/heat_cold" />
 
-    <ImageView
+    <com.example.john.heat.ColorWheelView
         android:id="@+id/imageViewCold"
         android:layout_width="@dimen/settings_color_wheel"
         android:layout_height="@dimen/settings_color_wheel"
         android:layout_marginTop="8dp"
         android:layout_marginEnd="8dp"
         android:contentDescription="@string/color_wheel_description"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/imageViewHot"
         app:srcCompat="@mipmap/ic_color_wheel" />
 
-    <Button
-        android:id="@+id/buttonSave"
-        style="@style/Widget.AppCompat.Button.Colored"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="8dp"
-        android:layout_marginRight="8dp"
-        android:layout_marginBottom="8dp"
-        android:text="@string/button_save"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent" />
+    <LinearLayout android:layout_height="match_parent">
+
+        <Button
+            android:id="@+id/buttonSave"
+            style="@style/Widget.AppCompat.Button.Colored"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom"
+            android:layout_marginLeft="8dp"
+            android:layout_marginRight="8dp"
+            android:layout_marginBottom="8dp"
+            android:text="@string/button_save" />
+    </LinearLayout>
+
 
 </TableLayout>

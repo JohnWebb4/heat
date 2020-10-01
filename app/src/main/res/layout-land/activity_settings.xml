@@ -1,122 +1,132 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<TableLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:stretchColumns="0, 2"
     tools:context="com.example.john.heat.SettingsActivity">
 
-    <TextView
-        android:id="@+id/textViewBrSize"
-        android:layout_width="wrap_content"
-        android:layout_height="@dimen/settings_element_height"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
-        android:text="@string/brush_size"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+    <TableRow android:layout_width="match_parent">
 
-    <TextView
-        android:id="@+id/textViewBrStrength"
-        android:layout_width="wrap_content"
-        android:layout_height="@dimen/settings_element_height"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
-        android:text="@string/brush_strength"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textViewBrSize" />
+        <TextView
+            android:id="@+id/textViewBrSize"
+            android:layout_width="wrap_content"
+            android:layout_height="@dimen/settings_element_height"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="8dp"
+            android:text="@string/brush_size" />
 
-    <SeekBar
-        android:id="@+id/seekBarBrSize"
-        style="@style/Widget.AppCompat.SeekBar"
-        android:layout_width="@dimen/seek_bar_width"
-        android:layout_height="@dimen/settings_element_height"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="8dp"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        <SeekBar
+            android:id="@+id/seekBarBrSize"
+            style="@style/Widget.AppCompat.SeekBar"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/settings_element_height"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="8dp" />
 
-    <SeekBar
-        android:id="@+id/seekBarBrStrength"
-        android:layout_width="@dimen/seek_bar_width"
-        android:layout_height="@dimen/settings_element_height"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="8dp"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/seekBarBrSize" />
+    </TableRow>
 
-    <TextView
-        android:id="@+id/textViewHeatK"
-        android:layout_width="wrap_content"
-        android:layout_height="@dimen/settings_element_height"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
-        android:text="@string/heat_ka"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textViewBrStrength" />
 
-    <SeekBar
-        android:id="@+id/seekBarHeatK"
-        android:layout_width="@dimen/seek_bar_width"
-        android:layout_height="@dimen/settings_element_height"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="8dp"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/seekBarBrStrength" />
+    <TableRow>
 
-    <TextView
-        android:id="@+id/textViewHot"
-        android:layout_width="wrap_content"
-        android:layout_height="@dimen/settings_element_height"
-        android:layout_marginStart="12dp"
-        android:layout_marginTop="8dp"
-        android:text="@string/heat_hot"
-        app:layout_constraintLeft_toRightOf="@+id/imageViewHot"
-        app:layout_constraintTop_toBottomOf="@+id/textViewHeatK" />
+        <TextView
+            android:id="@+id/textViewBrStrength"
+            android:layout_width="wrap_content"
+            android:layout_height="@dimen/settings_element_height"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="8dp"
+            android:text="@string/brush_strength" />
 
-    <ImageView
-        android:id="@+id/imageViewHot"
-        android:layout_width="@dimen/settings_color_wheel"
-        android:layout_height="@dimen/settings_color_wheel"
-        android:layout_marginStart="12dp"
-        android:layout_marginTop="8dp"
-        android:contentDescription="@string/color_wheel_description"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textViewHeatK"
-        app:srcCompat="@mipmap/ic_color_wheel" />
 
-    <TextView
-        android:id="@+id/textViewCold"
-        android:layout_width="wrap_content"
-        android:layout_height="@dimen/settings_element_height"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="8dp"
-        android:text="@string/heat_cold"
-        app:layout_constraintRight_toLeftOf="@+id/imageViewCold"
-        app:layout_constraintTop_toBottomOf="@+id/seekBarHeatK" />
+        <SeekBar
+            android:id="@+id/seekBarBrStrength"
+            android:layout_width="@dimen/seek_bar_width"
+            android:layout_height="@dimen/settings_element_height"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="8dp" />
+    </TableRow>
 
-    <ImageView
-        android:id="@+id/imageViewCold"
-        android:layout_width="@dimen/settings_color_wheel"
-        android:layout_height="@dimen/settings_color_wheel"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="8dp"
-        android:contentDescription="@string/color_wheel_description"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/seekBarHeatK"
-        app:srcCompat="@mipmap/ic_color_wheel" />
 
-    <Button
-        android:id="@+id/buttonSave"
-        style="@style/Widget.AppCompat.Button.Colored"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="8dp"
-        android:layout_marginRight="8dp"
-        android:layout_marginBottom="8dp"
-        android:text="@string/button_save"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent" />
+    <TableRow>
 
-</androidx.coordinatorlayout.widget.CoordinatorLayout>
+        <TextView
+            android:id="@+id/textViewHeatK"
+            android:layout_width="wrap_content"
+            android:layout_height="@dimen/settings_element_height"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="8dp"
+            android:text="@string/heat_ka" />
+
+        <SeekBar
+            android:id="@+id/seekBarHeatK"
+            android:layout_width="@dimen/seek_bar_width"
+            android:layout_height="@dimen/settings_element_height"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="8dp" />
+    </TableRow>
+
+
+    <TableRow>
+
+        <LinearLayout android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/textViewHot"
+                android:layout_width="wrap_content"
+                android:layout_height="@dimen/settings_element_height"
+                android:layout_marginStart="12dp"
+                android:layout_marginTop="8dp"
+                android:text="@string/heat_hot" />
+
+            <com.example.john.heat.ColorWheelView
+                android:id="@+id/imageViewHot"
+                android:layout_width="@dimen/settings_color_wheel"
+                android:layout_height="@dimen/settings_color_wheel"
+                android:layout_marginStart="12dp"
+                android:layout_marginTop="8dp"
+                android:contentDescription="@string/color_wheel_description"
+                app:srcCompat="@mipmap/ic_color_wheel" />
+        </LinearLayout>
+
+
+        <LinearLayout android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/textViewCold"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/settings_element_height"
+                android:layout_marginTop="8dp"
+                android:layout_marginEnd="8dp"
+                android:gravity="right"
+                android:text="@string/heat_cold" />
+
+            <com.example.john.heat.ColorWheelView
+                android:id="@+id/imageViewCold"
+                android:layout_width="@dimen/settings_color_wheel"
+                android:layout_height="@dimen/settings_color_wheel"
+                android:layout_gravity="right"
+                android:layout_marginTop="8dp"
+                android:layout_marginEnd="8dp"
+                android:contentDescription="@string/color_wheel_description"
+                app:srcCompat="@mipmap/ic_color_wheel" />
+        </LinearLayout>
+    </TableRow>
+
+
+    <LinearLayout android:layout_height="match_parent">
+
+        <Button
+            android:id="@+id/buttonSave"
+            style="@style/Widget.AppCompat.Button.Colored"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom"
+            android:layout_marginLeft="8dp"
+            android:layout_marginRight="8dp"
+            android:layout_marginBottom="8dp"
+            android:text="@string/button_save" />
+    </LinearLayout>
+
+
+</TableLayout>

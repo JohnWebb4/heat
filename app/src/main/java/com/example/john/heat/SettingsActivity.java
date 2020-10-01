@@ -2,15 +2,10 @@ package com.example.john.heat;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.graphics.Bitmap;
 import android.graphics.Color;
-import android.graphics.drawable.BitmapDrawable;
-import android.os.Bundle;
 import android.view.MenuItem;
-import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
-import android.widget.ImageView;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
@@ -105,30 +100,10 @@ public class SettingsActivity extends AppCompatActivity {
                 0);
     }
 
-    /**
-     * Get color from color wheel
-     *
-     * @param event      Motion event
-     * @param colorWheel ImageView for color wheel
-     * @return integer index for color
-     */
-    protected int getPixelFromWheel(MotionEvent event, ImageView colorWheel) {
-        // get bitmap convert to pixels in bitmap
-        Bitmap bitmap = ((BitmapDrawable) (colorWheel.getDrawable())).getBitmap();
-        int bitmapWidth = bitmap.getWidth();  // bitMap height
-        int bitmapHeight = bitmap.getHeight();  // bitmap height
-        float imageWidth = colorWheel.getWidth();
-        float imageHeight = colorWheel.getHeight();
-        int localX = (int) (event.getX() / imageWidth * bitmapWidth);  // get x
-        int localY = (int) (event.getY() / imageHeight * bitmapHeight);  // get y
-
-        // Get and set color
-        return bitmap.getPixel(localX, localY);  // get pixel
-    }
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
+    protected void onStart() {
+        super.onStart();
         setContentView(R.layout.activity_settings);
 
         SharedPreferences sharedPreferences = getSharedPreferences(
@@ -160,10 +135,10 @@ public class SettingsActivity extends AppCompatActivity {
         heatKBar.setProgress(convValue2SeekBar(heatKBar.getMax(),
                 heatK, maxHeatK, minHeatK));  // set progress
 
-        TextView coldView = (TextView) findViewById(R.id.textViewCold);  // get textview
+        final TextView coldView = (TextView) findViewById(R.id.textViewCold);  // get textview
         coldView.setTextColor(heatCold);  // set color
 
-        TextView hotView = (TextView) findViewById(R.id.textViewHot);  // get textview
+        final TextView hotView = (TextView) findViewById(R.id.textViewHot);  // get textview
         hotView.setTextColor(heatHot);  // set color
 
         // Hook button save
@@ -176,34 +151,20 @@ public class SettingsActivity extends AppCompatActivity {
         });
 
         // Hook Cold Color Wheel click
-        final ImageView imageViewCold = (ImageView) findViewById(R.id.imageViewCold);  // image view
-        imageViewCold.setOnTouchListener(new View.OnTouchListener() {
+        final ColorWheelView colorWheelCold = findViewById(R.id.imageViewCold);  // image view
+        colorWheelCold.addColorListener(new IColorListener() {
             @Override
-            public boolean onTouch(View view, MotionEvent motionEvent) {  // on touch
-                int action = motionEvent.getAction();  // get action
-                if (action == MotionEvent.ACTION_DOWN ||
-                        action == MotionEvent.ACTION_MOVE) {  // if down or move
-                    int color = getPixelFromWheel(motionEvent, imageViewCold);  // get color
-                    TextView textViewCold = (TextView) findViewById(R.id.textViewCold);  // text
-                    textViewCold.setTextColor(color);  // set color
-                }
-                return true;  // consume event
+            public void onColorChange(int color) {
+                coldView.setTextColor(color);
             }
         });
 
         // Hook Hot Color Wheel click
-        final ImageView imageViewHot = (ImageView) findViewById(R.id.imageViewHot);  // image view
-        imageViewHot.setOnTouchListener(new View.OnTouchListener() {
+        final ColorWheelView colorWheelHot = findViewById(R.id.imageViewHot);  // image view
+        colorWheelHot.addColorListener(new IColorListener() {
             @Override
-            public boolean onTouch(View view, MotionEvent motionEvent) {  // on touch
-                int action = motionEvent.getAction();  // get action
-                if (action == MotionEvent.ACTION_DOWN ||
-                        action == MotionEvent.ACTION_MOVE) {  // if down or move
-                    int color = getPixelFromWheel(motionEvent, imageViewHot);  // get color
-                    TextView textViewHot = (TextView) findViewById(R.id.textViewHot);  // text
-                    textViewHot.setTextColor(color);  // set color
-                }
-                return true;  // consume event
+            public void onColorChange(int color) {
+                hotView.setTextColor(color);
             }
         });
     }

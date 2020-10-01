@@ -6,6 +6,7 @@ import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
 
@@ -16,7 +17,7 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
-public class HeatActivity extends AppCompatActivity {
+public class HeatActivity extends AppCompatActivity implements SurfaceHolder.Callback {
     /**
      * Saved instance of heat map
      */
@@ -54,6 +55,7 @@ public class HeatActivity extends AppCompatActivity {
 
     Bitmap bitmap;
     float[][] heatMap;
+    SurfaceHolder surfaceHolder;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,10 +64,27 @@ public class HeatActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        final SurfaceView hSV = (SurfaceView) findViewById(R.id.heatSurface);  // surface
+        // If saved instance
+        if (savedInstanceState != null) {
+            this.heatMap = (float[][]) savedInstanceState.getSerializable(INSTANCE_HEAT_MAP);
+        }
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.menu_heat, menu);
+        return true;
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+
+        final SurfaceView hSV = findViewById(R.id.heatSurface);  // surface
 
         // On FAB Clear
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);  // get fab
+        FloatingActionButton fab = findViewById(R.id.fab);  // get fab
         fab.setOnClickListener(new View.OnClickListener() {  // hook click listenter
             @Override
             public void onClick(View view) {
@@ -75,21 +94,12 @@ public class HeatActivity extends AppCompatActivity {
             }
         });
 
-        // If saved instance
-        if (savedInstanceState != null) {
-            float[][] heatMap = (float[][]) savedInstanceState.getSerializable(INSTANCE_HEAT_MAP);
-            if (heatMap == null) {  // if no key to heat map
-                heatMap = new float[hSV.getWidth()][hSV.getHeight()];  // initialize
-            }
-            this.heatMap = heatMap;  // set previous heat map, till start
+        if (heatMap == null) {  // if no key to heat map
+            heatMap = new float[hSV.getWidth()][hSV.getHeight()];  // initialize
         }
-    }
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_heat, menu);
-        return true;
+        this.surfaceHolder = hSV.getHolder();
+        this.surfaceHolder.addCallback(this);
     }
 
     @Override
@@ -149,5 +159,40 @@ public class HeatActivity extends AppCompatActivity {
         Intent intent = new Intent(this, SettingsActivity.class);  // set target and parent
 
         startActivity(intent);  // open settings
+    }
+
+    @Override
+    public void surfaceCreated(SurfaceHolder holder) {
+
+    }
+
+    @Override
+    public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
+
+    }
+
+    @Override
+    public void surfaceDestroyed(SurfaceHolder holder) {
+
+    }
+
+    void initTimers() {
+
+    }
+
+    void checkAndResumeTimers() {
+
+    }
+
+    void stopTimers() {
+
+    }
+
+    void scheduleDraw() {
+
+    }
+
+    void draw() {
+
     }
 }
