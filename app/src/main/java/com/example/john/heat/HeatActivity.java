@@ -2,10 +2,11 @@ package com.example.john.heat;
 
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.SurfaceView;
 import android.view.View;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
@@ -17,44 +18,42 @@ import androidx.appcompat.widget.Toolbar;
 
 public class HeatActivity extends AppCompatActivity {
     /**
-     * Logging tag for debug
-     */
-    public static final String LOG_DEBUG = "Debug";
-
-    /**
      * Saved instance of heat map
      */
-    public static final String INSTANCE_HEAT_MAP = "com.example.heat.instance_heat_map";
+    static final String INSTANCE_HEAT_MAP = "com.example.heat.instance_heat_map";
 
     /**
      * Saved brush size
      */
-    public static final String SAVED_BRUSH_SIZE = "com.example.heat.brush_size";
+    static final String SAVED_BRUSH_SIZE = "com.example.heat.brush_size";
 
     /**
      * Saved brush strength
      */
-    public static final String SAVED_BRUSH_STRENGTH = "com.example.heat.brush_strength";
+    static final String SAVED_BRUSH_STRENGTH = "com.example.heat.brush_strength";
 
     /**
      * Saved cold color
      */
-    public static final String SAVED_COLD_COLOR = "com.example.heat.cold_color";
+    static final String SAVED_COLD_COLOR = "com.example.heat.cold_color";
 
     /**
      * Saved hot color
      */
-    public static final String SAVED_HOT_COLOR = "com.example.heat.hot_color";
+    static final String SAVED_HOT_COLOR = "com.example.heat.hot_color";
 
     /**
      * Saved heat k value
      */
-    public static final String SAVED_HEAT_K = "com.example.heat.heat_k";
+    static final String SAVED_HEAT_K = "com.example.heat.heat_k";
 
     /**
      * Saved preferences key
      */
     static final String SAVED_PREFERENCES_KEY = "com.example.heat.saved_preferences_key";
+
+    Bitmap bitmap;
+    float[][] heatMap;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -63,7 +62,7 @@ public class HeatActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        final HeatSurfaceView hSV = (HeatSurfaceView) findViewById(R.id.heatSurface);  // surface
+        final SurfaceView hSV = (SurfaceView) findViewById(R.id.heatSurface);  // surface
 
         // On FAB Clear
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);  // get fab
@@ -72,7 +71,7 @@ public class HeatActivity extends AppCompatActivity {
             public void onClick(View view) {
                 Snackbar.make(view, "Cleared", Snackbar.LENGTH_LONG)  // set text to appear
                         .setAction("Action", null).show();  // no action
-                hSV.clearMap();  // clear map
+                heatMap = new float[hSV.getWidth()][hSV.getHeight()];
             }
         });
 
@@ -80,10 +79,9 @@ public class HeatActivity extends AppCompatActivity {
         if (savedInstanceState != null) {
             float[][] heatMap = (float[][]) savedInstanceState.getSerializable(INSTANCE_HEAT_MAP);
             if (heatMap == null) {  // if no key to heat map
-                heatMap = new float[HeatThread.nRectWidth][HeatThread.nRectHeight];  // initialize
-                Log.d(LOG_DEBUG, "saved instance passed to onCreate(), but no heat map key-pair.");
+                heatMap = new float[hSV.getWidth()][hSV.getHeight()];  // initialize
             }
-            hSV.setHeatMap(heatMap);  // set previous heat map, till start
+            this.heatMap = heatMap;  // set previous heat map, till start
         }
     }
 
@@ -119,9 +117,8 @@ public class HeatActivity extends AppCompatActivity {
 
         // Save instance
         // Store heat map
-        HeatSurfaceView hSV = (HeatSurfaceView) findViewById(R.id.heatSurface);  // surface
         savedInstanceState.putSerializable(INSTANCE_HEAT_MAP,
-                hSV.getHeatMap());  // save heat map
+                heatMap);  // save heat map
     }
 
     /**
