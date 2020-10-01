@@ -5,7 +5,6 @@ import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.MenuItem;
 import android.view.MotionEvent;
@@ -14,6 +13,8 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.SeekBar;
 import android.widget.TextView;
+
+import androidx.appcompat.app.AppCompatActivity;
 
 public class SettingsActivity extends AppCompatActivity {
 
@@ -74,49 +75,52 @@ public class SettingsActivity extends AppCompatActivity {
 
     /**
      * Convert seek bar value to actual value
-     * @param max Max value from seekBar
+     *
+     * @param max       Max value from seekBar
      * @param seekValue Value from seekBar
-     * @param valueMax Max possible actual value
-     * @param valueMin Min possible actual value
+     * @param valueMax  Max possible actual value
+     * @param valueMin  Min possible actual value
      * @return Actual value
      */
-    public static float convSeekBar2Value(int max, int seekValue, float valueMax, float valueMin){
+    public static float convSeekBar2Value(int max, int seekValue, float valueMax, float valueMin) {
         // Convert
-        return Math.max(Math.min((seekValue / (float)(max) * (valueMax - valueMin) + valueMin),
+        return Math.max(Math.min((seekValue / (float) (max) * (valueMax - valueMin) + valueMin),
                 valueMax),
                 valueMin);  // convert
     }
 
     /**
      * Convert value to seekvar value
-     * @param max Max value from seekbar
-     * @param value Current value
+     *
+     * @param max      Max value from seekbar
+     * @param value    Current value
      * @param valueMax Max value
      * @param valueMin Min value
      * @return Nearest value on seekbar
      */
-    public static int convValue2SeekBar(int max, float value, float valueMax, float valueMin){
+    public static int convValue2SeekBar(int max, float value, float valueMax, float valueMin) {
         // Convert
-        return (int)Math.max(Math.min((value - valueMin) / (valueMax - valueMin) * max,
+        return (int) Math.max(Math.min((value - valueMin) / (valueMax - valueMin) * max,
                 max),
                 0);
     }
 
     /**
      * Get color from color wheel
-     * @param event Motion event
+     *
+     * @param event      Motion event
      * @param colorWheel ImageView for color wheel
      * @return integer index for color
      */
-    protected int getPixelFromWheel(MotionEvent event, ImageView colorWheel){
+    protected int getPixelFromWheel(MotionEvent event, ImageView colorWheel) {
         // get bitmap convert to pixels in bitmap
-        Bitmap bitmap = ((BitmapDrawable)(colorWheel.getDrawable())).getBitmap();
+        Bitmap bitmap = ((BitmapDrawable) (colorWheel.getDrawable())).getBitmap();
         int bitmapWidth = bitmap.getWidth();  // bitMap height
         int bitmapHeight = bitmap.getHeight();  // bitmap height
         float imageWidth = colorWheel.getWidth();
         float imageHeight = colorWheel.getHeight();
-        int localX = (int)(event.getX()/imageWidth*bitmapWidth);  // get x
-        int localY = (int)(event.getY()/imageHeight*bitmapHeight);  // get y
+        int localX = (int) (event.getX() / imageWidth * bitmapWidth);  // get x
+        int localY = (int) (event.getY() / imageHeight * bitmapHeight);  // get y
 
         // Get and set color
         return bitmap.getPixel(localX, localY);  // get pixel
@@ -178,7 +182,7 @@ public class SettingsActivity extends AppCompatActivity {
             public boolean onTouch(View view, MotionEvent motionEvent) {  // on touch
                 int action = motionEvent.getAction();  // get action
                 if (action == MotionEvent.ACTION_DOWN ||
-                        action == MotionEvent.ACTION_MOVE){  // if down or move
+                        action == MotionEvent.ACTION_MOVE) {  // if down or move
                     int color = getPixelFromWheel(motionEvent, imageViewCold);  // get color
                     TextView textViewCold = (TextView) findViewById(R.id.textViewCold);  // text
                     textViewCold.setTextColor(color);  // set color
@@ -194,7 +198,7 @@ public class SettingsActivity extends AppCompatActivity {
             public boolean onTouch(View view, MotionEvent motionEvent) {  // on touch
                 int action = motionEvent.getAction();  // get action
                 if (action == MotionEvent.ACTION_DOWN ||
-                        action == MotionEvent.ACTION_MOVE){  // if down or move
+                        action == MotionEvent.ACTION_MOVE) {  // if down or move
                     int color = getPixelFromWheel(motionEvent, imageViewHot);  // get color
                     TextView textViewHot = (TextView) findViewById(R.id.textViewHot);  // text
                     textViewHot.setTextColor(color);  // set color
@@ -205,7 +209,7 @@ public class SettingsActivity extends AppCompatActivity {
     }
 
     @Override
-    public boolean onOptionsItemSelected(MenuItem item){
+    public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == android.R.id.home) {  // if back arrow pressed
             finish();  // close settings
             return true;  // consume event
@@ -216,7 +220,7 @@ public class SettingsActivity extends AppCompatActivity {
     /**
      * Save settings and close
      */
-    protected void Save(){
+    protected void Save() {
         SharedPreferences sharedPreferences = getSharedPreferences(
                 HeatActivity.SAVED_PREFERENCES_KEY,
                 Context.MODE_PRIVATE);  // open shared preferences to edit

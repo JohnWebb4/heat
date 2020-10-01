@@ -3,15 +3,17 @@ package com.example.john.heat;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
-import android.support.v7.app.AlertDialog;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
 import android.util.Log;
-import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.android.material.snackbar.Snackbar;
+
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 
 public class HeatActivity extends AppCompatActivity {
     /**
@@ -75,7 +77,7 @@ public class HeatActivity extends AppCompatActivity {
         });
 
         // If saved instance
-        if (savedInstanceState != null){
+        if (savedInstanceState != null) {
             float[][] heatMap = (float[][]) savedInstanceState.getSerializable(INSTANCE_HEAT_MAP);
             if (heatMap == null) {  // if no key to heat map
                 heatMap = new float[HeatThread.nRectWidth][HeatThread.nRectHeight];  // initialize
@@ -103,8 +105,7 @@ public class HeatActivity extends AppCompatActivity {
         if (id == R.id.action_settings) {  // if settings clicked
             openSettings();  // open settings
             return true;  // consume event
-        }
-        else if (id == R.id.action_about) {  // if about clicked
+        } else if (id == R.id.action_about) {  // if about clicked
             openAbout();  // open about dialog
             return true;  // consume event
         }
@@ -113,7 +114,7 @@ public class HeatActivity extends AppCompatActivity {
     }
 
     @Override
-    public void onSaveInstanceState(Bundle savedInstanceState){
+    public void onSaveInstanceState(Bundle savedInstanceState) {
         super.onSaveInstanceState(savedInstanceState);  // call super
 
         // Save instance
@@ -126,7 +127,7 @@ public class HeatActivity extends AppCompatActivity {
     /**
      * Open about dialog
      */
-    public void openAbout(){
+    public void openAbout() {
         // Build about dialog
         AlertDialog aboutDialog = new AlertDialog.Builder(HeatActivity.this).create();  // build
         aboutDialog.setTitle("About");  // set title
@@ -146,7 +147,7 @@ public class HeatActivity extends AppCompatActivity {
     /**
      * Open settings
      */
-    public void openSettings(){
+    public void openSettings() {
         // Create Intent to open settings
         Intent intent = new Intent(this, SettingsActivity.class);  // set target and parent
 
