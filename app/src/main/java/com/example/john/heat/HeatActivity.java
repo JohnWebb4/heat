@@ -29,12 +29,14 @@ import androidx.appcompat.widget.Toolbar;
 
 public class HeatActivity extends AppCompatActivity implements SurfaceHolder.Callback {
     static final int INITIAL_DELAY_MS = 500; // ms
-    static final int IDEAL_FPS = 1;
+    static final int IDEAL_FPS = 30;
+    static final float MAX_HEAT_IN_K = 500;
 
     Bitmap bitmap;
     ScheduledExecutorService drawExecutorService;
     ScheduledFuture<?> drawScheduledFuture;
     float[] heatMap;
+    int[] pixels;
     long previousDrawTime;
     Settings settings;
     SurfaceHolder surfaceHolder;
@@ -45,7 +47,6 @@ public class HeatActivity extends AppCompatActivity implements SurfaceHolder.Cal
         setContentView(R.layout.activity_heat);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-
 
         initTimers();
     }
@@ -71,6 +72,7 @@ public class HeatActivity extends AppCompatActivity implements SurfaceHolder.Cal
                 Snackbar.make(view, "Cleared", Snackbar.LENGTH_LONG)  // set text to appear
                         .setAction("Action", null).show();  // no action
                 heatMap = new float[hSV.getWidth() * hSV.getHeight()];
+                pixels = new int[hSV.getWidth() * hSV.getHeight()];
             }
         });
 
@@ -163,9 +165,8 @@ public class HeatActivity extends AppCompatActivity implements SurfaceHolder.Cal
         if (bitmap == null || bitmap.getWidth() != width || bitmap.getHeight() != height) {
             bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
 
-            if (heatMap == null) {
-                heatMap = new float[width * height];
-            }
+            heatMap = new float[width * height];
+            pixels = new int[width * height];
         }
     }
 
@@ -213,7 +214,7 @@ public class HeatActivity extends AppCompatActivity implements SurfaceHolder.Cal
         }
 
         if (drawExecutorService == null || drawExecutorService.isShutdown()) {
-            drawExecutorService = Executors.newScheduledThreadPool(2);
+            drawExecutorService = Executors.newScheduledThreadPool(4);
         }
 
         drawScheduledFuture = drawExecutorService.scheduleAtFixedRate(new Runnable() {
@@ -231,12 +232,10 @@ public class HeatActivity extends AppCompatActivity implements SurfaceHolder.Cal
             return;
         }
 
-        float[] updatedHeatMap = Arrays.copyOf(heatMap, heatMap.length);
+        float[] copyHeatMap = Arrays.copyOf(heatMap, heatMap.length);
         long drawTime = System.currentTimeMillis();
-        int[] pixels = new int[heatMap.length];
         int height = bitmap.getHeight();
         int width = bitmap.getWidth();
-        int diffColor = settings.hotColor - settings.coldColor;
 
         if (previousDrawTime > 0) {
             try {
@@ -245,29 +244,28 @@ public class HeatActivity extends AppCompatActivity implements SurfaceHolder.Cal
                 for (int y = 1; y < height - 1; y++) {
                     for (int x = 1; x < width - 1; x++) {
                         int index = y * width + x;
-                        float diffHeat = heatMap[index - 1]
-                                + heatMap[index - width]
-                                + heatMap[index + width]
-                                + heatMap[index + 1]
-                                + heatMap[index - 1 - width]
-                                + heatMap[index + 1 - width]
-                                + heatMap[index - 1 + width]
-                                + heatMap[index + 1 + width]
-                                - 8 * heatMap[index];
+                        float avgDiffTemp = 8 * copyHeatMap[index]
+                                - copyHeatMap[index - 1]
+                                - copyHeatMap[index - width]
+                                - copyHeatMap[index + width]
+                                - copyHeatMap[index + 1]
+                                - copyHeatMap[index - 1 - width]
+                                - copyHeatMap[index + 1 - width]
+                                - copyHeatMap[index - 1 + width]
+                                - copyHeatMap[index + 1 + width];
 
-                        if (x == 550 && y == 850) {
-                            System.out.println(String.format("Diff heat %s, center %s, top %s, bottom %s, left %s, right %s, diff time %s", diffHeat, heatMap[index], heatMap[index - width], heatMap[index + width], heatMap[index - 1], heatMap[index + 1], diffTimeInSeconds));
+                        if (avgDiffTemp > 0 && avgDiffTemp < MAX_HEAT_IN_K) {
+                            float diffHeat = Math.max(Math.min(-settings.heatK * avgDiffTemp * diffTimeInSeconds, MAX_HEAT_IN_K), -MAX_HEAT_IN_K);
+                            heatMap[index] = Math.max(Math.min(heatMap[index] + diffHeat, MAX_HEAT_IN_K), 0);
                         }
+                        float fractionHeatToMax = heatMap[index] / MAX_HEAT_IN_K;
 
-
-                        if (!Float.isNaN(diffHeat)) {
-                            updatedHeatMap[index] += diffHeat * diffTimeInSeconds;
-                        }
-                        pixels[index] = settings.coldColor + (int) (updatedHeatMap[index] / 100 * diffColor);
+                        pixels[index] = (int) (settings.coldColor + (settings.hotColor - settings.coldColor) * (fractionHeatToMax));
                     }
                 }
 
-                this.heatMap = updatedHeatMap;
+                System.out.println(String.format("FPS %s", 1 / diffTimeInSeconds));
+
                 bitmap.setPixels(pixels, 0, width, 0, 0, width, height);
 
                 Canvas canvas = surfaceHolder.lockCanvas();
@@ -296,7 +294,8 @@ public class HeatActivity extends AppCompatActivity implements SurfaceHolder.Cal
 
         for (int y = minY; y < maxY; y++) {
             for (int x = minX; x < maxX; x++) {
-                heatMap[y * width + x] += settings.brushStrength;
+                int index = y * width + x;
+                heatMap[index] = Math.max(Math.min(heatMap[index] + settings.brushStrength, MAX_HEAT_IN_K), 0);
             }
         }
     }
