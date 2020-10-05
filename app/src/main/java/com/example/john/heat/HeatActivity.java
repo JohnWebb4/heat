@@ -8,6 +8,7 @@ import android.graphics.Rect;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
@@ -16,6 +17,7 @@ import android.view.ViewTreeObserver;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
 
+import java.util.Arrays;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
@@ -26,55 +28,15 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
 public class HeatActivity extends AppCompatActivity implements SurfaceHolder.Callback {
-    /**
-     * Saved instance of heat map
-     */
-    static final String INSTANCE_HEAT_MAP = "com.example.heat.instance_heat_map";
-
-    /**
-     * Saved brush size
-     */
-    static final String SAVED_BRUSH_SIZE = "com.example.heat.brush_size";
-
-    /**
-     * Saved brush strength
-     */
-    static final String SAVED_BRUSH_STRENGTH = "com.example.heat.brush_strength";
-
-    /**
-     * Saved cold color
-     */
-    static final String SAVED_COLD_COLOR = "com.example.heat.cold_color";
-
-    /**
-     * Saved hot color
-     */
-    static final String SAVED_HOT_COLOR = "com.example.heat.hot_color";
-
-    /**
-     * Saved heat k value
-     */
-    static final String SAVED_HEAT_K = "com.example.heat.heat_k";
-
-    /**
-     * Saved preferences key
-     */
-    static final String SAVED_PREFERENCES_KEY = "com.example.heat.saved_preferences_key";
-
-    /**
-     * Initial delay before running simulation after boot
-     */
     static final int INITIAL_DELAY_MS = 500; // ms
-
-    /**
-     * Ideal FPS of simulations
-     */
     static final int IDEAL_FPS = 1;
 
     Bitmap bitmap;
     ScheduledExecutorService drawExecutorService;
     ScheduledFuture<?> drawScheduledFuture;
-    int[] heatMap;
+    float[] heatMap;
+    long previousDrawTime;
+    Settings settings;
     SurfaceHolder surfaceHolder;
 
     @Override
@@ -84,10 +46,6 @@ public class HeatActivity extends AppCompatActivity implements SurfaceHolder.Cal
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        // If saved instance
-        if (savedInstanceState != null) {
-            this.heatMap = (int[]) savedInstanceState.getSerializable(INSTANCE_HEAT_MAP);
-        }
 
         initTimers();
     }
@@ -112,10 +70,17 @@ public class HeatActivity extends AppCompatActivity implements SurfaceHolder.Cal
             public void onClick(View view) {
                 Snackbar.make(view, "Cleared", Snackbar.LENGTH_LONG)  // set text to appear
                         .setAction("Action", null).show();  // no action
-                heatMap = new int[hSV.getWidth() * hSV.getHeight()];
+                heatMap = new float[hSV.getWidth() * hSV.getHeight()];
             }
         });
 
+        hSV.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                onSurfaceTouch(v, event);
+                return true;
+            }
+        });
         this.surfaceHolder = hSV.getHolder();
         this.surfaceHolder.addCallback(this);
     }
@@ -131,8 +96,12 @@ public class HeatActivity extends AppCompatActivity implements SurfaceHolder.Cal
     protected void onResume() {
         super.onResume();
 
+        // If saved instance
+        this.settings = Settings.loadSettings(this);
+
         checkAndResumeTimers();
     }
+
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -151,16 +120,6 @@ public class HeatActivity extends AppCompatActivity implements SurfaceHolder.Cal
         }
 
         return super.onOptionsItemSelected(item);
-    }
-
-    @Override
-    public void onSaveInstanceState(Bundle savedInstanceState) {
-        super.onSaveInstanceState(savedInstanceState);  // call super
-
-        // Save instance
-        // Store heat map
-        savedInstanceState.putSerializable(INSTANCE_HEAT_MAP,
-                heatMap);  // save heat map
     }
 
     /**
@@ -205,7 +164,7 @@ public class HeatActivity extends AppCompatActivity implements SurfaceHolder.Cal
             bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
 
             if (heatMap == null) {
-                heatMap = new int[width * height];
+                heatMap = new float[width * height];
             }
         }
     }
@@ -272,25 +231,75 @@ public class HeatActivity extends AppCompatActivity implements SurfaceHolder.Cal
             return;
         }
 
-        System.out.println("Draw");
+        float[] updatedHeatMap = Arrays.copyOf(heatMap, heatMap.length);
+        long drawTime = System.currentTimeMillis();
+        int[] pixels = new int[heatMap.length];
+        int height = bitmap.getHeight();
+        int width = bitmap.getWidth();
+        int diffColor = settings.hotColor - settings.coldColor;
 
-        try {
-            for (int y = 0; y < bitmap.getHeight(); y++) {
-                for (int x = 0; x < bitmap.getWidth(); x++) {
-                    int index = y * bitmap.getWidth() + x;
-                    heatMap[index] -= 10;
+        if (previousDrawTime > 0) {
+            try {
+                float diffTimeInSeconds = (drawTime - previousDrawTime) / 1000.0f;
+
+                for (int y = 1; y < height - 1; y++) {
+                    for (int x = 1; x < width - 1; x++) {
+                        int index = y * width + x;
+                        float diffHeat = heatMap[index - 1]
+                                + heatMap[index - width]
+                                + heatMap[index + width]
+                                + heatMap[index + 1]
+                                + heatMap[index - 1 - width]
+                                + heatMap[index + 1 - width]
+                                + heatMap[index - 1 + width]
+                                + heatMap[index + 1 + width]
+                                - 8 * heatMap[index];
+
+                        if (x == 550 && y == 850) {
+                            System.out.println(String.format("Diff heat %s, center %s, top %s, bottom %s, left %s, right %s, diff time %s", diffHeat, heatMap[index], heatMap[index - width], heatMap[index + width], heatMap[index - 1], heatMap[index + 1], diffTimeInSeconds));
+                        }
+
+
+                        if (!Float.isNaN(diffHeat)) {
+                            updatedHeatMap[index] += diffHeat * diffTimeInSeconds;
+                        }
+                        pixels[index] = settings.coldColor + (int) (updatedHeatMap[index] / 100 * diffColor);
+                    }
                 }
+
+                this.heatMap = updatedHeatMap;
+                bitmap.setPixels(pixels, 0, width, 0, 0, width, height);
+
+                Canvas canvas = surfaceHolder.lockCanvas();
+                canvas.drawBitmap(bitmap, 0, 0, null);
+                surfaceHolder.unlockCanvasAndPost(canvas);
+            } catch (IllegalStateException e) {
+                System.err.println(e);
             }
-
-            bitmap.setPixels(heatMap, 0, bitmap.getWidth(), 0, 0, bitmap.getWidth(), bitmap.getHeight());
-
-            Canvas canvas = surfaceHolder.lockCanvas();
-            canvas.drawBitmap(bitmap, 0, 0, null);
-            surfaceHolder.unlockCanvasAndPost(canvas);
+        }
 
 
-        } catch (IllegalStateException e) {
-            System.err.println(e);
+        previousDrawTime = drawTime;
+    }
+
+    void onSurfaceTouch(View v, MotionEvent event) {
+        float centerX = (int) event.getX();
+        int centerY = (int) event.getY();
+
+        int maxY = (int) Math.min(centerY + settings.brushSize / 2, bitmap.getHeight());
+        int minY = (int) Math.max(centerY - settings.brushSize / 2, 0);
+        int maxX = (int) Math.min(centerX + settings.brushSize / 2, bitmap.getWidth());
+        int minX = (int) Math.max(centerX - settings.brushSize / 2, 0);
+        int width = bitmap.getWidth();
+
+        System.out.println(String.format("On Surface touch %s %s, %s %s", minY, maxY, minX, maxX));
+
+        for (int y = minY; y < maxY; y++) {
+            for (int x = minX; x < maxX; x++) {
+                heatMap[y * width + x] += settings.brushStrength;
+            }
         }
     }
+
+
 }
